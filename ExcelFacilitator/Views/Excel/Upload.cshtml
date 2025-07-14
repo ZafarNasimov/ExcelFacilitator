@@ -1,0 +1,75 @@
+﻿@using ExcelFacilitator.Models.ViewModels
+@model ExcelUploadViewModel
+@{
+    ViewData["Title"] = "Upload Excel File";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow rounded-4">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">📤 Upload Excel File</h2>
+
+                    <form asp-action="Upload" enctype="multipart/form-data" method="post">
+                        <div class="form-group mb-3">
+                            <label asp-for="ExcelFile" class="form-label">Select Excel File</label>
+                            <input asp-for="ExcelFile" class="form-control" type="file" accept=".xlsx" />
+                            <span asp-validation-for="ExcelFile" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                            Upload
+                        </button>
+                    </form>
+
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-success mt-4" role="alert">
+                            @ViewBag.Message
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="loadingIndicator" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Uploading...</span>
+    </div>
+</div>
+
+<style>
+    #loadingIndicator {
+        position: fixed;
+        z-index: 1050;
+        background-color: rgba(255, 255, 255, 0.6);
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #loadingIndicator .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.querySelector('form').addEventListener('submit', function () {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+        });
+    </script>
+}

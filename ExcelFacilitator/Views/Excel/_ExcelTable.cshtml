@@ -1,0 +1,70 @@
+﻿@using ExcelFacilitator.Models.Domain
+@model List<ExcelRecord>
+<table class="table table-bordered table-sm">
+    @{
+        var currentSort = ViewBag.SortColumn as string ?? "";
+        var sortDir = ViewBag.SortDirection as string ?? "asc";
+
+        string GetSortIcon(string column)
+        {
+            if (currentSort != column) return "";
+            return sortDir == "asc" ? "▲" : "▼";
+        }
+
+        string GetNextDirection(string column)
+        {
+            if (currentSort != column) return "asc";
+            return sortDir == "asc" ? "desc" : "asc";
+        }
+    }
+    <thead>
+        <tr>
+            <th>#</th>
+            <th><a href="#" class="sort-link" data-column="ContractNo" data-direction="@GetNextDirection("ContractNo")">Contract No @GetSortIcon("ContractNo")</a></th>
+            <th><a href="#" class="sort-link" data-column="ContractDate" data-direction="@GetNextDirection("ContractDate")">Contract Date @GetSortIcon("ContractDate")</a></th>
+            <th><a href="#" class="sort-link" data-column="InvoiceNo" data-direction="@GetNextDirection("InvoiceNo")">Invoice No @GetSortIcon("InvoiceNo")</a></th>
+            <th><a href="#" class="sort-link" data-column="InvoiceDate" data-direction="@GetNextDirection("InvoiceDate")">Invoice Date @GetSortIcon("InvoiceDate")</a></th>
+            <th><a href="#" class="sort-link" data-column="SellerTin" data-direction="@GetNextDirection("SellerTin")">Seller TIN @GetSortIcon("SellerTin")</a></th>
+            <th><a href="#" class="sort-link" data-column="BuyerTin" data-direction="@GetNextDirection("BuyerTin")">Buyer TIN @GetSortIcon("BuyerTin")</a></th>
+            <th><a href="#" class="sort-link" data-column="ItemName" data-direction="@GetNextDirection("ItemName")">Item Name @GetSortIcon("ItemName")</a></th>
+            <th><a href="#" class="sort-link" data-column="ItemCatalogCode" data-direction="@GetNextDirection("ItemCatalogCode")">Item Code @GetSortIcon("ItemCatalogCode")</a></th>
+            <th><a href="#" class="sort-link" data-column="Unit" data-direction="@GetNextDirection("Unit")">Unit @GetSortIcon("Unit")</a></th>
+            <th><a href="#" class="sort-link" data-column="Quantity" data-direction="@GetNextDirection("Quantity")">Quantity @GetSortIcon("Quantity")</a></th>
+            <th><a href="#" class="sort-link" data-column="TotalWithVat" data-direction="@GetNextDirection("TotalWithVat")">Total w/VAT @GetSortIcon("TotalWithVat")</a></th>
+            <th><a href="#" class="sort-link" data-column="DocumentDate" data-direction="@GetNextDirection("DocumentDate")">Document Date @GetSortIcon("DocumentDate")</a></th>
+            <th><a href="#" class="sort-link" data-column="SourceFile" data-direction="@GetNextDirection("SourceFile")">Source File @GetSortIcon("SourceFile")</a></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var r = Model[i];
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@r.ContractNo</td>
+                <td>@r.ContractDate.ToShortDateString()</td>
+                <td>@r.InvoiceNo</td>
+                <td>@r.InvoiceDate.ToShortDateString()</td>
+                <td>@r.SellerTin</td>
+                <td>@r.BuyerTin</td>
+                <td>@r.ItemName</td>
+                <td>@r.ItemCatalogCode</td>
+                <td>@r.Unit</td>
+                <td>@r.Quantity</td>
+                <td>@r.TotalWithVat</td>
+                <td>@r.DocumentDate.ToShortDateString()</td>
+                <td>@r.SourceFile</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot class="table-light fw-bold">
+        <tr>
+            <td colspan="10" class="text-end">Total:</td>
+            <td>@Model.Sum(x => x.Quantity)</td>
+            <td>@Model.Sum(x => x.TotalWithVat)</td>
+            <td colspan="2"></td>
+        </tr>
+    </tfoot>
+</table>
+
+

@@ -1,0 +1,304 @@
+﻿@using ExcelFacilitator.Models.Domain
+@{
+    ViewData["Title"] = "Home Page";
+}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<div id="loadingIndicator" style="display:none; text-align:center; margin: 10px 0;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<form asp-controller="Excel" asp-action="Filter" method="post" id="filterForm">
+    <div class="card shadow-sm p-4 mb-4">
+        <h5 class="mb-4">Filter Excel Records</h5>
+
+        <!-- Date Ranges -->
+        <fieldset class="border rounded p-3 mb-4">
+            <legend class="float-none w-auto px-2">Date Filters</legend>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="ContractDateFrom" class="form-label">Contract Date From</label>
+                    <input type="date" class="form-control" id="ContractDateFrom" name="ContractDateFrom" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ContractDateTo" class="form-label">Contract Date To</label>
+                    <input type="date" class="form-control" id="ContractDateTo" name="ContractDateTo" />
+                </div>
+                <div class="col-md-3">
+                    <label for="DocumentDateFrom" class="form-label">Document Date From</label>
+                    <input type="date" class="form-control" id="DocumentDateFrom" name="DocumentDateFrom" />
+                </div>
+                <div class="col-md-3">
+                    <label for="DocumentDateTo" class="form-label">Document Date To</label>
+                    <input type="date" class="form-control" id="DocumentDateTo" name="DocumentDateTo" />
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Decimal Ranges -->
+        <fieldset class="border rounded p-3 mb-4">
+            <legend class="float-none w-auto px-2">Amount Filters</legend>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="QuantityFrom" class="form-label">Quantity From</label>
+                    <input type="number" step="0.01" class="form-control" id="QuantityFrom" name="QuantityFrom" />
+                </div>
+                <div class="col-md-3">
+                    <label for="QuantityTo" class="form-label">Quantity To</label>
+                    <input type="number" step="0.01" class="form-control" id="QuantityTo" name="QuantityTo" />
+                </div>
+                <div class="col-md-3">
+                    <label for="PriceFrom" class="form-label">Price From</label>
+                    <input type="number" step="0.01" class="form-control" id="PriceFrom" name="PriceFrom" />
+                </div>
+                <div class="col-md-3">
+                    <label for="PriceTo" class="form-label">Price To</label>
+                    <input type="number" step="0.01" class="form-control" id="PriceTo" name="PriceTo" />
+                </div>
+                <div class="col-md-3">
+                    <label for="PriceWithVatFrom" class="form-label">Price w/VAT From</label>
+                    <input type="number" step="0.01" class="form-control" id="PriceWithVatFrom" name="PriceWithVatFrom" />
+                </div>
+                <div class="col-md-3">
+                    <label for="PriceWithVatTo" class="form-label">Price w/VAT To</label>
+                    <input type="number" step="0.01" class="form-control" id="PriceWithVatTo" name="PriceWithVatTo" />
+                </div>
+                <div class="col-md-3">
+                    <label for="TotalWithVatFrom" class="form-label">Total w/VAT From</label>
+                    <input type="number" step="0.01" class="form-control" id="TotalWithVatFrom" name="TotalWithVatFrom" />
+                </div>
+                <div class="col-md-3">
+                    <label for="TotalWithVatTo" class="form-label">Total w/VAT To</label>
+                    <input type="number" step="0.01" class="form-control" id="TotalWithVatTo" name="TotalWithVatTo" />
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Dropdowns -->
+        <fieldset class="border rounded p-3 mb-4">
+            <legend class="float-none w-auto px-2">Entity Filters</legend>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="SellerTin" class="form-label">Seller TIN</label>
+                    <select id="SellerTin" name="SellerTin" class="form-select select2-ajax" data-column="SellerTin" multiple="multiple"></select>
+                </div>
+                <div class="col-md-3">
+                    <label for="BuyerTin" class="form-label">Buyer TIN</label>
+                    <select id="BuyerTin" name="BuyerTin" class="form-select select2-ajax" data-column="BuyerTin"></select>
+                </div>
+                <div class="col-md-3">
+                    <label for="ItemCatalogCode" class="form-label">Item Catalog Code</label>
+                    <select id="ItemCatalogCode" name="ItemCatalogCode" class="form-select select2-ajax" data-column="ItemCatalogCode"></select>
+                </div>
+                <div class="col-md-3">
+                    <label for="SourceFile" class="form-label">Source File</label>
+                    <select id="SourceFile" name="SourceFile" class="form-select select2-ajax" data-column="SourceFile"></select>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Rows & Submit -->
+        <div class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label for="NumberOfRows" class="form-label">Rows to Show</label>
+                <input type="number" min="1" class="form-control" id="NumberOfRows" name="NumberOfRows" />
+            </div>
+            <div class="col-md-4">
+                <label for="TopCriteria" class="form-label">Limit Criteria</label>
+                <select id="TopCriteria" name="TopCriteria" class="form-select">
+                    <option value="">-- No Limit --</option>
+                    <option value="TopQuantity">Top Quantity</option>
+                    <option value="BottomQuantity">Bottom Quantity</option>
+                    <option value="TopTotalPrice">Top Total w/VAT</option>
+                    <option value="BottomTotalPrice">Bottom Total w/VAT</option>
+                    <option value="MostRecentContractDate">Most Recent Contract Date</option>
+                    <option value="OldestContractDate">Oldest Contract Date</option>
+                </select>
+            </div>
+            <div class="col-md-2 ms-auto align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Analytics Dropdown -->
+<div class="card shadow-sm p-4 mb-4">
+    <h5 class="mb-3">Analytics</h5>
+    <div class="row">
+        <div class="col-md-4">
+            <label for="analyticsType" class="form-label">Choose Analytics Type</label>
+            <select id="analyticsType" class="form-select">
+                <option value="">-- Select Analytics --</option>
+                <option value="TopSoldItems">Top 30 Most Sold Items (Qty)</option>
+                <option value="LeastSoldItems">Bottom 30 Most Sold Items (Qty)</option>
+                <option value="TopValuableItems">Top 30 Most Valuable Items</option>
+                <option value="LeastValuableItems">Bottom 30 Most Valuable Items</option>
+                <option value="TopBuyers">Top 30 Buyers by Spending</option>
+                <option value="LeastBuyers">Bottom 30 Buyers by Spending</option>
+                <option value="TopSellers">Top 30 Sellers by Income</option>
+                <option value="LeastSellers">Bottom 30 Sellers by Income</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 align-self-end">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="useGlobalData" />
+                <label class="form-check-label" for="useGlobalData">
+                    Global Analytics
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Placeholder for analytics results -->
+<div id="analyticsContainer"></div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+          $(document).ready(function () {
+            $('.select2-ajax').each(function () {
+                const column = $(this).data('column');
+
+                $(this).select2({
+                    width: '100%',
+                    placeholder: '-- Select --',
+                    allowClear: true,
+                    multiple: true,
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: `/Excel/GetUniqueValues?column=${column}`,
+                        dataType: 'json',
+                        delay: 250,
+                        processResults: function (data) {
+                            return {
+                                results: data.map(value => ({
+                                    id: value,
+                                    text: value
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            });
+            $('#filterForm').on('submit', function (e) {
+                    e.preventDefault();
+                    const formData = $(this).serialize();
+                    $('#loadingIndicator').show();
+
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        success: function (html) {
+                            $('#tableContainer').html(html);
+                            $('#analyticsType').val('').trigger('change');
+                        },
+                        error: function () {
+                            alert('Failed to apply filters.');
+                        },
+                        complete: function () {
+                            $('#loadingIndicator').hide();
+                        }
+                    });
+                });
+          });
+          $('#analyticsType').on('change', function () {
+                const type = $(this).val();
+                const useGlobal = $('#useGlobalData').is(':checked');
+
+                if (!type) {
+                    $('#analyticsContainer').html('');
+                    return;
+                }
+
+                let data = `type=${type}&useGlobal=${useGlobal}`;
+
+                // Include filters only if not global
+                if (!useGlobal) {
+                    const formData = $('#filterForm').serialize();
+                    data += `&${formData}`;
+                }
+                $('#loadingIndicator').show();
+
+                $.post('/Excel/GetAnalytics', data, function (html) {
+                    $('#analyticsContainer').html(html);
+                    $('#loadingIndicator').hide();
+                }).fail(function () {
+                    alert("Analytics failed to load.");
+                });
+            });
+    </script>
+    <script>
+            $(document).on('click', '.sort-link', function (e) {
+            e.preventDefault();
+            const sortColumn = $(this).data('column');
+            const sortDirection = $(this).data('direction');
+
+            console.log("Sorting by:", sortColumn, sortDirection);
+
+            const form = $('form');
+            const formData = form.serialize() + `&sortColumn=${sortColumn}&sortDirection=${sortDirection}`;
+
+            $.post('/Excel/Filter', formData, function (html) {
+                $('#tableContainer').html(html);
+            }).fail(function (err) {
+                console.error("POST failed", err);
+            });
+        });
+    </script>
+}
+
+
+<div class="mt-4" id="tableContainer">
+    @await Html.PartialAsync("~/Views/Excel/_ExcelTable.cshtml", new List<ExcelRecord>())
+</div>
+
+<style>
+    #loadingIndicator {
+        position: absolute;
+        z-index: 999;
+        background-color: rgba(255, 255, 255, 0.6);
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        min-height: 40px;
+        height: auto;
+    }
+
+    .select2-selection--multiple {
+        display: flex !important;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        height: auto !important;
+        padding: 6px 8px;
+    }
+
+    .select2-selection__choice {
+        background-color: #0d6efd;
+        border: none;
+        color: white;
+        padding: 4px 8px;
+        margin: 2px 5px 0 0;
+        border-radius: 12px;
+        font-size: 0.85em;
+    }
+
+    .select2-container .select2-selection--multiple .select2-search__field {
+        width: 100% !important;
+    }
+</style>
+
+
